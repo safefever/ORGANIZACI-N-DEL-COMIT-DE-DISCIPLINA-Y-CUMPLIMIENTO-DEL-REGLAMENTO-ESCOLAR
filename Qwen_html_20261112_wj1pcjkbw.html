@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comité de Disciplina | Liderazgo Escolar</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: #e0e8f0;
+    position: relative;
+  }
+
+  .geo-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background: radial-gradient(ellipse at center, #3a4f63 0%, #2a3a4a 40%, #1e2d3d 100%);
+  }
+
+  .geo-shape-tr {
+    position: fixed;
+    top: -50px;
+    right: -50px;
+    width: 500px;
+    height: 500px;
+    z-index: -1;
+    opacity: 0.9;
+  }
+
+  .geo-shape-bl {
+    position: fixed;
+    bottom: -50px;
+    left: -50px;
+    width: 500px;
+    height: 500px;
+    z-index: -1;
+    opacity: 0.9;
+  }
+
+  .app-container {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  .center-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+  }
+
+  /* TÍTULO ECLÉCTICO MARKETING */
+  .center-panel h1 {
+    font-size: 2.8rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    max-width: 700px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #feca57 0%, #ff6b9d 50%, #4facfe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 40px rgba(254,202,87,0.3);
+    animation: titleGlow 3s ease-in-out infinite;
+  }
+
+  @keyframes titleGlow {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.2); }
+  }
+
+  .center-panel .tagline {
+    font-size: 1.3rem;
+    font-weight: 300;
+    color: #c8d8e8;
+    margin-bottom: 0.5rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .center-panel .subtitle {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    font-weight: 400;
+    color: #8fa8c0;
+    font-style: italic;
+  }
+
+  .center-panel .cta-text {
+    margin-top: 1.5rem;
+    opacity: 0.8;
+    max-width: 450px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #a0b8d0;
+    padding: 1rem;
+    border-left: 3px solid #feca57;
+    text-align: left;
+  }
+
+  /* BOTONES */
+  .side-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem 1rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .side-panel.left { align-items: flex-end; }
+  .side-panel.right { align-items: flex-start; }
+
+  .nav-btn {
+    background: rgba(42, 58, 74, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(200,216,232,0.2);
+    color: #c8d8e8;
+    padding: 1rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    width: 100%;
+    max-width: 220px;
+    transition: all 0.3s ease;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.5px;
+  }
+
+  .nav-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(200,216,232,0.15), transparent);
+    transition: left 0.5s;
+  }
+
+  .nav-btn:hover::before { left: 100%; }
+
+  .nav-btn:hover {
+    transform: scale(1.05);
+    background: rgba(58, 79, 99, 0.8);
+    border-color: rgba(200,216,232,0.4);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+
+  .nav-btn.active {
+    background: linear-gradient(135deg, #4a6a8a, #3a5a7a);
+    border-color: #6a8aaa;
+    box-shadow: 0 0 25px rgba(106,138,170,0.4);
+    color: #fff;
+  }
+
+  .nav-btn .icon {
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+
+  /* PANELES DESLIZANTES */
+  .slide-panel {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 45%;
+    max-width: 550px;
+    background: rgba(30, 45, 61, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(200,216,232,0.15);
+    padding: 3rem 2.5rem;
+    overflow-y: auto;
+    z-index: 10;
+    transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 0 0 60px rgba(0,0,0,0.5);
+  }
+
+  .slide-panel.left-panel {
+    left: 0;
+    transform: translateX(-110%);
+    border-right: 2px solid rgba(106,138,170,0.4);
+  }
+
+  .slide-panel.right-panel {
+    right: 0;
+    transform: translateX(110%);
+    border-left: 2px solid rgba(106,138,170,0.4);
+  }
+
+  .slide-panel.open {
+    transform: translateX(0);
+  }
+
+  .slide-panel h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: #c8d8e8;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(200,216,232,0.2);
+    padding-bottom: 0.8rem;
+  }
+
+  .slide-panel h3 {
+    color: #8fa8c0;
+    font-size: 1.1rem;
+    margin: 1.5rem 0 0.7rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid rgba(143,168,192,0.2);
+    letter-spacing: 0.5px;
+  }
+
+  .slide-panel ul {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .slide-panel li {
+    padding: 0.5rem 0 0.5rem 1.5rem;
+    position: relative;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #a0b8d0;
+  }
+
+  .slide-panel li::before {
+    content: '◆';
+    position: absolute;
+    left: 0;
+    color: #6a8aaa;
+    font-size: 0.7rem;
+    top: 0.7rem;
+  }
+
+  .slide-panel strong {
+    color: #c8d8e8;
+    font-weight: 600;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(200,216,232,0.1);
+    border: 1px solid rgba(200,216,232,0.2);
+    color: #c8d8e8;
+    width: 40px; height: 40px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.3rem;
+    transition: all 0.3s;
+  }
+
+  .close-btn:hover {
+    background: rgba(106,138,170,0.3);
+    transform: rotate(90deg);
+  }
+
+  .left-panel .close-btn { right: auto; left: 1rem; }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 5;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+
+  .overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .credit-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    padding: 1rem;
+    background: rgba(30, 45, 61, 0.9);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(200,216,232,0.1);
+    z-index: 3;
+    font-size: 0.85rem;
+    color: #6a8aaa;
+    letter-spacing: 1px;
+  }
+
+  .credit-footer strong {
+    color: #c8d8e8;
+    font-weight: 600;
+  }
+
+  @media (max-width: 900px) {
+    .app-container {
+      grid-template-columns: 1fr;
+    }
+    .side-panel {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+    .side-panel.left, .side-panel.right { align-items: center; }
+    .nav-btn { max-width: 160px; font-size: 0.85rem; }
+    .center-panel h1 { font-size: 2rem; }
+    .slide-panel { width: 90%; max-width: none; }
+    .credit-footer { font-size: 0.75rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="geo-bg"></div>
+
+<svg class="geo-shape-tr" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <g opacity="0.6">
+    <rect x="200" y="0" width="40" height="300" fill="#4a6a8a" transform="rotate(45 220 150)"/>
+    <rect x="260" y="0" width="30" height="350" fill="#3a5a7a" transform="rotate(45 275 175)"/>
+    <rect x="310" y="0" width="25" height="400" fill="#5a7a9a" transform="rotate(45 322 200)"/>
+    <rect x="360" y="0" width="20" height="450" fill="#2a4a6a" transform="rotate(45 370 225)"/>
+    <rect x="400" y="50" width="35" height="400" fill="#4a6a8a" transform="rotate(45 417 250)"/>
+    <rect x="440" y="100" width="30" height="350" fill="#3a5a7a" transform="rotate(45 455 275)"/>
+    <rect x="100" y="200" width="300" height="25" fill="#4a6a8a" transform="rotate(45 250 212)"/>
+    <rect x="150" y="250" width="280" height="20" fill="#3a5a7a" transform="rotate(45 290 260)"/>
+  </g>
+</svg>
+
+<svg class="geo-shape-bl" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <g opacity="0.6">
+    <rect x="0" y="200" width="300" height="40" fill="#4a6a8a" transform="rotate(45 150 220)"/>
+    <rect x="0" y="260" width="350" height="30" fill="#3a5a7a" transform="rotate(45 175 275)"/>
+    <rect x="0" y="310" width="400" height="25" fill="#5a7a9a" transform="rotate(45 200 322)"/>
+    <rect x="0" y="360" width="450" height="20" fill="#2a4a6a" transform="rotate(45 225 370)"/>
+    <rect x="50" y="400" width="400" height="35" fill="#4a6a8a" transform="rotate(45 250 417)"/>
+    <rect x="100" y="440" width="350" height="30" fill="#3a5a7a" transform="rotate(45 275 455)"/>
+    <rect x="200" y="100" width="25" height="300" fill="#4a6a8a" transform="rotate(45 212 250)"/>
+    <rect x="250" y="150" width="20" height="280" fill="#3a5a7a" transform="rotate(45 260 290)"/>
+  </g>
+</svg>
+
+<div class="overlay" id="overlay"></div>
+
+<!-- Paneles Izquierdos -->
+<div class="slide-panel left-panel" id="panel-legal">
+  <button class="close-btn" onclick="closePanel()">✕</button>
+  <h2>⚖️ Marco Legal y Normativo</h2>
+  <h3>Ley de Reforma Educativa</h3>
+  <ul>
+    <li><strong>Artículo de Referencia:</strong> Ley 85-2018</li>
+    <li><strong>Objetivo:</strong> Ambiente escolar seguro y óptimo para el aprendizaje</li>
+  </ul>
+  <h3>Reglamentación Aplicable</h3>
+  <ul>
+    <li>Reglamento General de Estudiantes</li>
+    <li>Asistencia Obligatoria del DEPR: 2020</li>
+    <li>Reglamento de Medidas Correctivas</li>
+  </ul>
+</div>
+
+<div class="slide-panel left-panel" id="panel-constitucion">
+  <button class="close-btn" onclick="closePanel()">✕</button>
+  <h2>🏛️ Constitución del Comité</h2>
+  <h3>Composición Escolar</h3>
+  <ul>
+    <li><strong>Director de Escuela:</strong> Presidente del comité</li>
+    <li><strong>Personal de Apoyo:</strong> Trabajador social y consejero</li>
+    <li><strong>Comunidad Escolar:</strong> Participación activa de padres y tutores</li>
+  </ul>
+  <h3>Comités Especializados</h3>
+  <ul>
+    <li>Comité de Seguridad y Disciplina</li>
+    <li>Comité de Revisión del Lenguaje (CoReL)</li>
+  </ul>
+</div>
+
+<div class="slide-panel left-panel" id="panel-clima">
+  <button class="close-btn" onclick="closePanel()">✕</button>
+  <h2>🌱 Clima Seguro en el Salón</h2>
+  <h3>Ambiente de Aprendizaje</h3>
+  <ul>
+    <li><strong>Expectativas Claras:</strong> Normas de sana convivencia establecidas</li>
+    <li><strong>Apoyo Docente:</strong> Asesoramiento al maestro en manejo de conducta</li>
+  </ul>
+  <h3>Prevención de Acoso</h3>
+  <ul>
+    <li><strong>Bullying y Suicidio:</strong> Campañas preventivas conjuntas</li>
+    <li><strong>Dilucidación:</strong> Mediación institucional de incidentes</li>
+  </ul>
+</div>
+
+<!-- Paneles Derechos -->
+<div class="slide-panel right-panel" id="panel-proceso">
+  <button class="close-btn" onclick="closePanel()">✕</button>
+  <h2>⚙️ Flujo del Debido Proceso</h2>
+  <h3>Fases de Intervención</h3>
+  <ul>
+    <li><strong>Agotar Recursos:</strong> Orientación previa obligatoria</li>
+    <li><strong>Derecho a Expresarse:</strong> Escucha ordenada y respetuosa</li>
+    <li><strong>Documentación:</strong> Registro formal en el expediente</li>
+  </ul>
+  <h3>Términos y Evaluaciones</h3>
+  <ul>
+    <li><strong>Plazo de Evaluación:</strong> 15 días para psicólogos o consejeros</li>
+    <li><strong>Casos de Educación Especial:</strong> Manual de Procedimiento especial</li>
+  </ul>
+</div>
+
+<div class="slide-panel right-panel" id="panel-medidas">
+  <button class="close-btn" onclick="closePanel()">✕</button>
+  <h2>🤝 Medidas Restaurativas Graduales</h2>
+  <h3>Enfoque Preventivo</h3>
+  <ul>
+    <li><strong>Propósito:</strong> Reeducar y rehabilitar al estudiante</li>
+    <li><strong>Prácticas Restaurativas:</strong> Reparar daños y restaurar relaciones</li>
+    <li><strong>Proporcionalidad:</strong> Sanción proporcional a la falta</li>
+  </ul>
+  <h3>Restricciones y Sanciones</h3>
+  <ul>
+    <li><strong>Suspensión Externa:</strong> Método excluyente y extraordinario</li>
+    <li><strong>Protección de Derechos:</strong> Prohibido privar del derecho a la educación</li>
+  </ul>
+</div>
+
+<!-- APP -->
+<div class="app-container">
+
+  <div class="side-panel left">
+    <button class="nav-btn" onclick="openPanel('panel-legal', this)">
+      <span class="icon">⚖️</span>
+      Marco Legal
+    </button>
+    <button class="nav-btn" onclick="openPanel('panel-constitucion', this)">
+      <span class="icon">🏛️</span>
+      Constitución del Comité
+    </button>
+    <button class="nav-btn" onclick="openPanel('panel-clima', this)">
+      <span class="icon">🌱</span>
+      Clima Seguro
+    </button>
+  </div>
+
+  <div class="center-panel">
+    <p class="tagline">🎯 Liderazgo Escolar de Alto Impacto</p>
+    <h1>Disciplina que Transforma: El Comité que Cambia tu Escuela</h1>
+    <p class="subtitle">Organización + Reglamento = Éxito Escolar Garantizado</p>
+    <p class="cta-text">
+      💡 <strong>Descubre cómo</strong> estructurar un comité de disciplina efectivo, 
+      cumplir el reglamento escolar y crear un ambiente de aprendizaje seguro. 
+      <strong>Haz clic en los paneles laterales</strong> para explorar cada componente.
+    </p>
+  </div>
+
+  <div class="side-panel right">
+    <button class="nav-btn" onclick="openPanel('panel-proceso', this)">
+      <span class="icon">⚙️</span>
+      Debido Proceso
+    </button>
+    <button class="nav-btn" onclick="openPanel('panel-medidas', this)">
+      <span class="icon">🤝</span>
+      Medidas Restaurativas
+    </button>
+  </div>
+
+</div>
+
+<div class="credit-footer">
+  Creado por <strong>Dr. Enrique Cordero Soto</strong> · Profesor Universitario · Superintendente
+</div>
+
+<script>
+  function openPanel(panelId, btn) {
+    document.querySelectorAll('.slide-panel').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(panelId).classList.add('open');
+    document.getElementById('overlay').classList.add('active');
+    if (btn) btn.classList.add('active');
+  }
+
+  function closePanel() {
+    document.querySelectorAll('.slide-panel').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('overlay').classList.remove('active');
+  }
+
+  document.getElementById('overlay').addEventListener('click', closePanel);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closePanel();
+  });
+</script>
+
+</body>
+</html>
